@@ -2,6 +2,28 @@
 
 namespace ProjetFichier
 {
+    public struct Client { 
+
+        public int NumeroClient;
+        public string Nom; //stocker en MAJUSCULE
+        public string Prenom; // Premiere lettre en Majuscule
+        public string Numero;
+       
+        public Client() 
+        { 
+            NumeroClient = 0;
+            Nom = string.Empty;
+            Prenom = string.Empty;
+            Numero = string.Empty;
+          
+           
+        }
+           
+    
+    
+    }
+
+
     internal class Program
     {
         static void Main(string[] args)
@@ -11,6 +33,33 @@ namespace ProjetFichier
 
 
 
+
+
+
+
+
+
+
+
+
+        public static string FirstMajuscule(string prenom)
+        {
+            if (string.IsNullOrWhiteSpace(prenom)) return string.Empty;
+            prenom = prenom.Trim();
+            char first = char.ToUpperInvariant(prenom[0]);
+            string rest = prenom.Length > 1 ? prenom.Substring(1).ToLowerInvariant() : string.Empty;
+            return first + rest;
+        }
+
+        public static string Majuscule(string Nom )
+
+        {  
+            return Nom.ToUpper(); 
+
+
+        }
+
+       
 
 
 
