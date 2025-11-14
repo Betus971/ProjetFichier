@@ -1,31 +1,48 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace ProjetFichier
 {
-    public struct Client { 
-
+    public struct Client
+    {
         public int NumeroClient;
-        public string Nom; //stocker en MAJUSCULE
-        public string Prenom; // Premiere lettre en Majuscule
-        public string Numero;
-       
-        public Client() 
-        { 
+        public string Nom;      // MAJUSCULE
+        public string Prenom;   // Première lettre majuscule
+        public string Telephone;
+
+        public Client()
+        {
             NumeroClient = 0;
             Nom = string.Empty;
             Prenom = string.Empty;
-            Numero = string.Empty;
-          
-           
+            Telephone = string.Empty;
         }
-           
-    
-    
+        public void WriteTo(BinaryWriter bw)
+        {
+            bw.Write(NumeroClient);
+            bw.Write(Nom ?? "");
+            bw.Write(Prenom ?? "");
+            bw.Write(Telephone ?? "");
+        }
+
+        public static Client ReadFrom(BinaryReader br)
+        {
+            return new Client
+            {
+                NumeroClient = br.ReadInt32(),
+                Nom = br.ReadString(),
+                Prenom = br.ReadString(),
+                Telephone = br.ReadString()
+            };
+        }
     }
 
 
     internal class Program
     {
+        private static object br;
+
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World");
@@ -37,10 +54,68 @@ namespace ProjetFichier
 
 
 
+        public static List<Client> LireTousLesClients(string cheminFichier)
+        {
+            var clients = new List<Client>(); 
+
+            if (!File.Exists(cheminFichier))
+            {
+                Console.WriteLine("Le fichier n'existe pas.");
+                return clients;
+            }
+
+            using (var reader = new BinaryReader(File.Open(cheminFichier, FileMode.Open, FileAccess.Read)))
+            {
+                while (reader.BaseStream.Position < reader.BaseStream.Length)
+                {
+                    
+                    clients.Add(Client.ReadFrom(reader));
+                }
+            }
+
+            return clients; 
+        }
+
+
+        public static void AfficherClientParNom()
+        {
+            string LeFichier = @"C:\Users\leona\source\repos\ClientFichier.bin";
+            string NomRecherche = Majuscule(Console.ReadLine());
 
 
 
+            if (!File.Exists(LeFichier))
+            {
+                Console.WriteLine("Le fichier n'existe pas.");
+                return;
+            }
+            Console.Write("Entrez le nom du client rechercher");
+            List<Client> clients = LireTousLesClients(LeFichier);
+          
+            
+            
+            List<Client> ClientsTrouves = clients.FindAll(c => c.Nom == NomRecherche);
 
+            if (ClientsTrouves.Count == 0)
+            {
+
+                Console.WriteLine("Aucun client trouvé avec ce nom.");
+
+            }
+            else
+            {
+                foreach (Client c in ClientsTrouves)
+                {
+                    int index = clients.IndexOf(c); // Récupère l'index dans la liste complète
+                    Console.WriteLine($"Fiche n°{index + 1} :");
+                    Console.WriteLine($"  Numéro : {c.NumeroClient}");
+                    Console.WriteLine($"  Nom : {c.Nom}");
+                    Console.WriteLine($"  Prénom : {c.Prenom}");
+                    Console.WriteLine($"  Téléphone : {c.Telephone}\n");
+                }
+            }
+
+        }
 
         public static string FirstMajuscule(string prenom)
         {
